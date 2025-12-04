@@ -9,34 +9,48 @@ import (
 func main() {
 	rawInput, err := os.Open("../input.txt")
 	if err != nil {
-		fmt.Printf("input error: %v", err)
+		fmt.Printf("input error: %v\n", err)
 		return
 	}
 	defer rawInput.Close()
+
+	const k = 12
 	answer := 0
+
 	scanner := bufio.NewScanner(rawInput)
 	for scanner.Scan() {
 		bank := scanner.Text()
+		n := len(bank)
 
-		higher := byte('0')
-		lower := byte('0')
+		chosen := make([]byte, 0, k)
 
-		for i := 0; i < len(bank); i++ {
-			char := bank[i]
+		for i := range n {
+			d := bank[i]
+			remain := n - i
 
-			if i < len(bank)-1 {
-				if char > higher {
-					higher = char
-					lower = byte('0')
-					continue
-				}
+			for len(chosen) > 0 &&
+				chosen[len(chosen)-1] < d &&
+				len(chosen)-1+remain >= k {
+
+				chosen = chosen[:len(chosen)-1]
 			}
-			if char > lower {
-				lower = char
+
+			if len(chosen) < k {
+				chosen = append(chosen, d)
 			}
 		}
-		sum := int(higher-'0')*10 + int(lower-'0')
-		answer = answer + sum
+
+		value := 0
+		for _, c := range chosen {
+			value = value*10 + int(c-'0')
+		}
+
+		answer += value
+	}
+
+	if err := scanner.Err(); err != nil {
+		fmt.Printf("scan error: %v\n", err)
+		return
 	}
 
 	fmt.Println(answer)
