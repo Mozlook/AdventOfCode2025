@@ -7,30 +7,16 @@ import (
 	"strings"
 )
 
-func DFS(start string, graph map[string][]string, visited map[string]bool, hasSpecial bool) int {
-	if start == "fft" || start == "dac" {
-		hasSpecial = true
-	}
-
-	if visited[start] {
-		return 0
-	}
-
+func DFS(start string, graph map[string][]string) int {
 	if start == "out" {
-		if hasSpecial {
-			return 1
-		}
-		return 0
+		return 1
 	}
-
-	visited[start] = true
-	defer func() { visited[start] = false }()
-
-	count := 0
-	for _, nb := range graph[start] {
-		count += DFS(nb, graph, visited, hasSpecial)
+	paths := 0
+	neighbors := graph[start]
+	for i := range neighbors {
+		paths += DFS(neighbors[i], graph)
 	}
-	return count
+	return paths
 }
 
 func main() {
@@ -49,5 +35,5 @@ func main() {
 		key := fields[0][:3]
 		nbhList[key] = fields[1:]
 	}
-	fmt.Println(DFS("svr", nbhList, make(map[string]bool, 0), false))
+	fmt.Println(DFS("you", nbhList))
 }
